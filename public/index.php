@@ -1,8 +1,10 @@
 <?php
 require('../helpers.php');
-require basePath('Framework/Database.php');
-require(basePath('Framework/Router.php'));
 
+spl_autoload_register(function ($class) {
+    $path = basePath('Framework/' . $class . '.php');
+    require $path;
+});
 // Instantiating the router
 $router = new Router();
 
