@@ -22,9 +22,11 @@
                                 <li class="mb-2">
                                     <strong>Location:</strong> <?= $listing->city ?>, <?= $listing->state ?>
                                 </li>
-                                <li class="mb-2">
-                                    <strong>Tags:</strong> <span><?= $listing->tags ?></span>
-                                </li>
+                                <?php if (!empty($listing->tags)) : ?>
+                                    <li class="mb-2">
+                                        <strong>Tags:</strong> <span><?= $listing->tags ?></span>
+                                    </li>
+                                <?php endif; ?>
                                 <li class="mb-2">
                                     <strong>Requirements:</strong> <span><?= $listing->requirements ?></span>
                                 </li>

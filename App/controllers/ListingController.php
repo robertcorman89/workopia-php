@@ -54,11 +54,43 @@ class ListingController
      * Store a job listing in database
      * @return void
      */
-    public function store($body)
+    public function store()
     {
         $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'state', 'phone', 'email', 'requirements', 'benefits'];
         $newListingData = array_intersect_key($_POST, array_flip($allowedFields));
-        $newListingData['user_id'] = 1;
+        $newListingData['user_id'] = 2;
         $newListingData = array_map('sanitize', $newListingData);
+        $requiredFields = ['title', 'description', 'email', 'city', 'state', 'salary'];
+        $errors = [];
+        foreach ($requiredFields as $field) {
+            if (empty($newListingData[$field]) || !Validation::string($newListingData[$field])) {
+                $errors[$field] = ucfirst($field) . ' is required';
+            }
+        }
+        if (!empty($errors)) {
+            // Reload view with erros
+            loadView('listings/create', ['errors' => $errors, 'listing' => $newListingData]);
+        } else {
+            //Submit data
+            $fields = [];
+            foreach ($newListingData as $field => $value) {
+                $fields[] = $field;
+            }
+            $fields = implode(', ', $fields);
+            inspect($fields);
+            $values = [];
+            foreach ($newListingData as $field => $value) {
+                if ($value === '') {
+                    $newListingData[$field] = null;
+                }
+                $values[] = ':' . $field;
+            }
+            $values = implode(', ', $values);
+            inspect($values);
+            $query = "INSERT INTO listings ($fields) VALUES ($values)";
+            $this->db->query($query, $newListingData);
+            // Redirect to listings
+            redirect('/listings');
+        }
     }
 }
