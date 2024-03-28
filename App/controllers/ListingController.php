@@ -141,6 +141,11 @@ class ListingController
             ErrorController::notFound('Listing not found');
             return;
         }
+        // Authorization
+        if (!Authorization::isOwner($listing->user_id)) {
+            Session::setFlashMessage('error_message', 'You are not authorized to delete this listing!');
+            return redirect('/listings/' . $listing->id);
+        }
         loadView('listings/edit', ['listing' => $listing]);
     }
 
@@ -160,12 +165,20 @@ class ListingController
             ErrorController::notFound('Listing not found');
             return;
         }
+
+        // Authorization
+        if (!Authorization::isOwner($listing->user_id)) {
+            Session::setFlashMessage('error_message', 'You are not authorized to edit this listing!');
+            return redirect('/listings/' . $listing->id);
+        }
+
         $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'state', 'phone', 'email', 'requirements', 'benefits'];
         $updateValues = [];
         $updateValues = array_intersect_key($_POST, array_flip($allowedFields));
         $updateValues = array_map('sanitize', $updateValues);
         $requiredFields = ['title', 'description', 'salary', 'email', 'city', 'state'];
         $errors = [];
+
         foreach ($requiredFields as $field) {
             if (empty($updateValues[$field]) || !Validation::string($updateValues[$field])) {
                 $errors[$field] = ucfirst($field) . ' is required';
