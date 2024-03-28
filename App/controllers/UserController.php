@@ -6,6 +6,7 @@ use Framework\Database;
 use Framework\Validation;
 use Framework\Session;
 
+
 class UserController
 {
     protected $db;
