@@ -97,13 +97,27 @@ class UserController
         $this->db->query('INSERT INTO users (name, email, city, state, password) VALUES (:name, :email, :city, :state, :password)', $params);
         // Get new user id
         $userId = $this->db->conn->lastInsertId();
-        Session::set($user, [
+        Session::set('user', [
             'id' => $userId,
             'name' => $name,
             'email' => $email,
             'city' => $city,
             'state' => $state
         ]);
+        inspect(Session::get('user'));
+        redirect('/');
+    }
+
+    /**
+     * Logout a userr and kill session
+     * 
+     * @return void
+     */
+    public function logout()
+    {
+        Session::clear('user');
+        $params = session_get_cookie_params();
+        setcookie('PHPSESSID', '', time() - 86400, $params['path'], $params['domain']);
         redirect('/');
     }
 }
